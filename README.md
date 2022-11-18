@@ -1,4 +1,4 @@
-# GRRM
+# Analysis of GRRM log files
 
 ## Overview
 Source code to analyze GRRM log files.
