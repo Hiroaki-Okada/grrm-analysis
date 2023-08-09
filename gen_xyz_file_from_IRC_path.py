@@ -4,7 +4,7 @@ import os
 import sys
 
 
-def define():
+def get_log_name():
     print('\nEnter log name (like xxx.log)')
     log_name = input().split('.log')[0]
     log_path = log_name + '.log'
@@ -13,20 +13,17 @@ def define():
         print('\n{} doesn\'t exists...\n'.format(log_path))
         sys.exit(0)
 
-    log_file = open(log_path, 'r')
-    log_file_content = log_file.readlines()
-    log_file.close()
-
-    return log_name, log_file_content
+    return log_name
 
 
-def gen_irc_xyz(log_name, log_file_content):
+def extract_irc_and_ts(log_file_content):
     isTSRead = False
     isIRCRead = False
     ts_l = []
     irc_l = []
+    middle_idx = 0
 
-    for idx, line in enumerate(log_file_content):
+    for line in log_file_content:
         # Start TS extraction
         if 'INITIAL STRUCTURE' in line:
             isTSRead = True
@@ -63,8 +60,12 @@ def gen_irc_xyz(log_name, log_file_content):
 
     irc_path = irc_l[:middle_idx][::-1] + ts_l + irc_l[middle_idx:]
 
-    xyz_file = open(log_name + '.xyz', 'w')
+    return irc_path, middle_idx
 
+
+def generate_xyz_file(log_name, irc_path, middle_idx):
+    xyz_file = open(log_name + '.xyz', 'w')
+    
     for i_idx, i in enumerate(irc_path):
         for j_idx, j in enumerate(i):
             if j_idx == 0:
@@ -79,12 +80,15 @@ def gen_irc_xyz(log_name, log_file_content):
 
     xyz_file.close()
 
-    print('\n{}.xyz was generated.\n'.format(log_name))
-
 
 def run():
-    log_name, log_file_content = define()
-    gen_irc_xyz(log_name, log_file_content)
+    log_name = get_log_name()
+    with open(log_name + '.log', 'r') as log_file:
+        log_file_content = log_file.readlines()
+
+    irc_path, middle_idx = extract_irc_and_ts(log_file_content)
+    generate_xyz_file(log_name, irc_path, middle_idx)
+    print('\n{}.xyz was generated.\n'.format(log_name))
 
 
 if __name__ == '__main__':
