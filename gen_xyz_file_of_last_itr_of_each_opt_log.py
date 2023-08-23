@@ -2,16 +2,35 @@ import pdb
 
 import os
 import re
+import sys
 import glob
 
 from scipy.spatial import distance
 
 
-# # # # # PARAMETER # # # # #
-mode = 'home' # work or home
-atom_pairs = [[1, 2], [1, 3]]
-# atom_pairs = [[1, 2]]
-# # # # # # # # # # # # # # #
+# # # # # # # PARAMETER # # # # # # #
+atom_pairs = [[1, 2], [1, 3], [2, 3]]
+# # # # # # # # # # # # # # # # # # #
+
+
+def get_configuration():
+    print('\nEnter program mode (work/home)')
+    mode = input()
+
+    if mode not in ['work', 'home']:
+        print('Invalid mode was specified.')
+        sys.exit(0)
+
+    print('\nEnter wildcards in filenames. If there are multiple candidates, enter one per line.')
+    match_str_l = []
+    while True:
+        match_str = input()
+        if match_str == '':
+            break
+
+        match_str_l.append(match_str)
+
+    return mode, match_str_l
 
 
 def get_pop_dirs():
@@ -27,7 +46,7 @@ def convert_atom_xyz(atom_xyz):
     for i in atom_xyz:
         tmp_atom_xyz = i.rstrip('\n')
         tmp_atom_xyz = re.split(r'\s+', tmp_atom_xyz)
-        new_atom_xyz =[tmp_atom_xyz[0]] + [float(j) for j in tmp_atom_xyz[1:]]
+        new_atom_xyz = [tmp_atom_xyz[0]] + [float(j) for j in tmp_atom_xyz[1:]]
         converted_atom_xyz.append(new_atom_xyz)
 
     return converted_atom_xyz
@@ -90,15 +109,16 @@ def output_results(log_path, atom_pairs, bond_distances):
 
 
 def run():
-    print('\nEnter wildcards in filenames')
-    match_str = input()
+    mode, match_str_l = get_configuration()
 
     if mode == 'work':
-        log_paths = sorted(glob.glob(os.path.join(os.getcwd(), '*', match_str)))
+        log_paths = [sorted(glob.glob(os.path.join(os.getcwd(), '*', i))) for i in match_str_l]
     elif mode == 'home':
-        log_paths = sorted(glob.glob(match_str))
+        log_paths = [sorted(glob.glob(i)) for i in match_str_l]
     else:
         raise ValueError('Imvalid mode was specified...')
+
+    log_paths = sum(log_paths, [])
 
     atom_xyz = open('Last_itr_str.xyz', 'w')
     for log_path in log_paths:
