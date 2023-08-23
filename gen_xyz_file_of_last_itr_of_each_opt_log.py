@@ -8,9 +8,9 @@ import glob
 from scipy.spatial import distance
 
 
-# # # # # # # PARAMETER # # # # # # #
+# # # # # PARAMETER # # # # #
 atom_pairs = [[1, 2], [1, 3], [2, 3]]
-# # # # # # # # # # # # # # # # # # #
+# # # # # # # # # # # # # # #
 
 
 def get_configuration():
@@ -100,7 +100,7 @@ def output_results(log_path, atom_pairs, bond_distances):
     if atom_pairs == []:
         return
 
-    print('\n', log_path)
+    print('\n' + log_path)
     for atom_ij, distance in zip(atom_pairs, bond_distances):
         atom_i = atom_ij[0]
         atom_j = atom_ij[1]
