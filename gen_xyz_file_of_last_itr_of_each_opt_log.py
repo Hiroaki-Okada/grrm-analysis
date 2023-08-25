@@ -5,11 +5,12 @@ import re
 import sys
 import glob
 
-from scipy.spatial import distance
+# from scipy.spatial import distance
 
 
 # # # # # PARAMETER # # # # #
-atom_pairs = [[1, 2], [1, 3], [2, 3]]
+# atom_pairs = [[1, 2], [1, 3], [2, 3]]
+atom_pairs = [[1, 2]]
 # # # # # # # # # # # # # # #
 
 
@@ -90,7 +91,8 @@ def get_bond_distances(atom_xyz, atom_pairs):
         atom_i_xyz = converted_atom_xyz[atom_i_num][1:]
         atom_j_xyz = converted_atom_xyz[atom_j_num][1:]
 
-        bond_len = distance.euclidean(atom_i_xyz, atom_j_xyz)
+        # bond_len = distance.euclidean(atom_i_xyz, atom_j_xyz)
+        bond_len = sum([(i - j) ** 2 for i, j in zip(atom_i_xyz, atom_j_xyz)]) ** 0.5
         bond_lens.append(bond_len)
 
     return bond_lens
@@ -112,13 +114,13 @@ def run():
     mode, match_str_l = get_configuration()
 
     if mode == 'work':
-        log_paths = [sorted(glob.glob(os.path.join(os.getcwd(), '*', i))) for i in match_str_l]
+        log_paths = [glob.glob(os.path.join(os.getcwd(), '*', i)) for i in match_str_l]
     elif mode == 'home':
-        log_paths = [sorted(glob.glob(i)) for i in match_str_l]
+        log_paths = [glob.glob(i) for i in match_str_l]
     else:
         raise ValueError('Imvalid mode was specified...')
 
-    log_paths = sum(log_paths, [])
+    log_paths = sorted(sum(log_paths, []))
 
     atom_xyz = open('Last_itr_str.xyz', 'w')
     for log_path in log_paths:
