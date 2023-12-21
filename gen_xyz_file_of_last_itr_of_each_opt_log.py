@@ -8,12 +8,6 @@ import glob
 # from scipy.spatial import distance
 
 
-# # # # # PARAMETER # # # # #
-# atom_pairs = [[1, 2], [1, 3], [2, 3]]
-atom_pairs = [[1, 2]]
-# # # # # # # # # # # # # # #
-
-
 def get_configuration():
     print('\nEnter program mode (work/home)')
     mode = input()
@@ -31,7 +25,13 @@ def get_configuration():
 
         match_str_l.append(match_str)
 
-    return mode, match_str_l
+    print('\nEnter a number of atom pairs')
+    num = int(input())
+
+    print('\nEnter atom pairs')
+    atom_pairs = [list(map(int, input().split())) for i in range(num)]
+
+    return mode, match_str_l, atom_pairs
 
 
 def get_pop_dirs():
@@ -58,6 +58,7 @@ def get_last_itr_atom_xyz(log_path):
         log_file_content = log_file.readlines()
 
     itr = 0
+    atom_xyz = []
     isRead = False
     for line in log_file_content:
         if isRead and 'Item' in line:
@@ -82,6 +83,9 @@ def get_last_itr_atom_xyz(log_path):
 
 
 def get_bond_distances(atom_xyz, atom_pairs):
+    if atom_xyz == []:
+        return [-1]
+
     bond_lens = []
     converted_atom_xyz = convert_atom_xyz(atom_xyz)
     for each_atom_pair in atom_pairs:
@@ -111,16 +115,18 @@ def output_results(log_path, atom_pairs, bond_distances):
 
 
 def run():
-    mode, match_str_l = get_configuration()
+    mode, match_str_l, atom_pairs = get_configuration()
 
     if mode == 'work':
         log_paths = [glob.glob(os.path.join(os.getcwd(), '*', i)) for i in match_str_l]
     elif mode == 'home':
         log_paths = [glob.glob(i) for i in match_str_l]
     else:
-        raise ValueError('Imvalid mode was specified...')
+        raise ValueError('Invalid mode was specified...')
 
+    # Avoid inappropriate files
     log_paths = sorted(sum(log_paths, []))
+    log_paths = [i for i in log_paths if 'GauJOB' not in i and i.split('.')[-1] == 'log']
 
     atom_xyz = open('Last_itr_str.xyz', 'w')
     for log_path in log_paths:
