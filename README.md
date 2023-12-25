@@ -7,6 +7,9 @@ Source code to analyze GRRM log files.
 ### cut_AFIR_path_for_LUP.py
 Cut out specified regions of the AFIR path to reduce the cost of LUP calculations.
 
+### eq_clustering.py
+Read xxx_EQ_list.log and cluster EQs based on the difference of distance matrices.
+
 ### gen_xyz_from_opt_log.py
 Generate an xyz file (for Chemcraft) from a ITR of GRRM log file. FrozenAtoms are also written.
 
