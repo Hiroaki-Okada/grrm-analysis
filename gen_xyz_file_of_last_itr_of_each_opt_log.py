@@ -26,7 +26,11 @@ def get_configuration():
         match_str_l.append(match_str)
 
     print('\nEnter a number of atom pairs')
-    num = int(input())
+    num = input()
+    if num == '':
+        num = 0
+    else:
+        num = int(num)
 
     print('\nEnter atom pairs')
     atom_pairs = [list(map(int, input().split())) for i in range(num)]
